@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qianfeng.meet.dao.TstatusMapper">
+  <resultMap id="BaseResultMap" type="com.qianfeng.meet.pojo.Tstatus">
+    <id column="statusId" jdbcType="INTEGER" property="statusId" />
+    <result column="statusName" jdbcType="VARCHAR" property="statusName" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    statusId, statusName
+  </sql>
+
+  <select id="selectAll" resultType="com.qianfeng.meet.pojo.Tstatus">
+    select * from tstatus
+  </select>
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from tstatus
+    where statusId = #{statusId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from tstatus
+    where statusId = #{statusId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.qianfeng.meet.pojo.Tstatus">
+    insert into tstatus (statusId, statusName)
+    values (#{statusId,jdbcType=INTEGER}, #{statusName,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.qianfeng.meet.pojo.Tstatus">
+    insert into tstatus
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="statusId != null">
+        statusId,
+      </if>
+      <if test="statusName != null">
+        statusName,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="statusId != null">
+        #{statusId,jdbcType=INTEGER},
+      </if>
+      <if test="statusName != null">
+        #{statusName,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.qianfeng.meet.pojo.Tstatus">
+    update tstatus
+    <set>
+      <if test="statusName != null">
+        statusName = #{statusName,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where statusId = #{statusId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.qianfeng.meet.pojo.Tstatus">
+    update tstatus
+    set statusName = #{statusName,jdbcType=VARCHAR}
+    where statusId = #{statusId,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qianfeng.meet.dao.MeetMapper">
+  <resultMap id="BaseResultMap" type="com.qianfeng.meet.pojo.Meet">
+    <id column="meetId" jdbcType="INTEGER" property="meetId" />
+    <result column="meetName" jdbcType="VARCHAR" property="meetName" />
+    <result column="loc" jdbcType="VARCHAR" property="loc" />
+    <result column="hasTv" jdbcType="VARCHAR" property="hasTv" />
+    <result column="num" jdbcType="INTEGER" property="num" />
+    <result column="statusId" jdbcType="INTEGER" property="statusId" />
+
+    <association property="tstatus" resultMap="com.qianfeng.meet.dao.TstatusMapper.BaseResultMap">
+    </association>
+
+    <collection property="bookList" resultMap="com.qianfeng.meet.dao.BookMapper.BaseResultMap">
+    </collection>
+
+  </resultMap>
+  <sql id="Base_Column_List">
+    meetId, meetName, loc, hasTv, num, statusId
+  </sql>
+
+  <select id="findAllRedis" resultType="com.qianfeng.meet.pojo.Meet">
+    select
+    <include refid="Base_Column_List" />
+    from tmeet
+  </select>
+
+  <select id="findAllRoom" resultMap="BaseResultMap">
+    select
+      tm.*,
+      mt.meettime as BeginTime,
+      mt2.meettime as EndTime,
+      man.*,
+      tb.*,
+      ts.*
+    from tmeet tm left join tbook tb on tm.meetId=tb.meetId and (tb.meetDate=#{dates} or tb.meetDate is null)
+                  left JOIN meetTime mt on tb.BeginTimeId=mt.meettimeId
+                  left join meetTime mt2 on tb.EndTimeId=mt2.meettimeId
+                  left join tman man on tb.hostId=man.manId
+                  left join tstatus ts on tm.statusId=ts.statusId
+  </select>
+
+
+  <select id="selectAll" resultMap="BaseResultMap">
+    select
+      tm.meetId,tm.meetName,tm.loc,tm.hasTv,tm.num,tm.statusId,
+      ts.statusId,ts.statusName
+    from tmeet tm inner join tstatus ts on tm.statusId=ts.statusId
+  </select>
+
+
+  <select id="selectByCondition" resultMap="BaseResultMap">
+    select
+      tm.meetId,tm.meetName,tm.loc,tm.hasTv,tm.num,tm.statusId,
+      ts.statusId,ts.statusName
+    from tmeet tm inner join tstatus ts on tm.statusId=ts.statusId
+    <where>
+      <if test="meetName != null and meetName != ''">
+        meetName like concat('%',#{meetName},'%')
+      </if>
+      <if test="loc != null and loc != ''">
+        and loc=#{loc}
+      </if>
+      <if test="statusId != null">
+        and tm.statusId=#{statusId}
+      </if>
+    </where>
+  </select>
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from tmeet
+    where meetId = #{meetId,jdbcType=INTEGER}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from tmeet
+    where meetId = #{meetId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.qianfeng.meet.pojo.Meet">
+    insert into tmeet (meetId, meetName, loc,
+      hasTv, num, statusId
+      )
+    values (#{meetId,jdbcType=INTEGER}, #{meetName,jdbcType=VARCHAR}, #{loc,jdbcType=VARCHAR},
+      #{hasTv,jdbcType=VARCHAR}, #{num,jdbcType=INTEGER}, #{statusId,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.qianfeng.meet.pojo.Meet">
+    insert into tmeet
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="meetId != null">
+        meetId,
+      </if>
+      <if test="meetName != null">
+        meetName,
+      </if>
+      <if test="loc != null">
+        loc,
+      </if>
+      <if test="hasTv != null">
+        hasTv,
+      </if>
+      <if test="num != null">
+        num,
+      </if>
+      <if test="statusId != null">
+        statusId,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="meetId != null">
+        #{meetId,jdbcType=INTEGER},
+      </if>
+      <if test="meetName != null">
+        #{meetName,jdbcType=VARCHAR},
+      </if>
+      <if test="loc != null">
+        #{loc,jdbcType=VARCHAR},
+      </if>
+      <if test="hasTv != null">
+        #{hasTv,jdbcType=VARCHAR},
+      </if>
+      <if test="num != null">
+        #{num,jdbcType=INTEGER},
+      </if>
+      <if test="statusId != null">
+        #{statusId,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.qianfeng.meet.pojo.Meet">
+    update tmeet
+    <set>
+      <if test="meetName != null">
+        meetName = #{meetName,jdbcType=VARCHAR},
+      </if>
+      <if test="loc != null">
+        loc = #{loc,jdbcType=VARCHAR},
+      </if>
+      <if test="hasTv != null">
+        hasTv = #{hasTv,jdbcType=VARCHAR},
+      </if>
+      <if test="num != null">
+        num = #{num,jdbcType=INTEGER},
+      </if>
+      <if test="statusId != null">
+        statusId = #{statusId,jdbcType=INTEGER},
+      </if>
+    </set>
+    where meetId = #{meetId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.qianfeng.meet.pojo.Meet">
+    update tmeet
+    set meetName = #{meetName,jdbcType=VARCHAR},
+      loc = #{loc,jdbcType=VARCHAR},
+      hasTv = #{hasTv,jdbcType=VARCHAR},
+      num = #{num,jdbcType=INTEGER},
+      statusId = #{statusId,jdbcType=INTEGER}
+    where meetId = #{meetId,jdbcType=INTEGER}
+  </update>
+</mapper>

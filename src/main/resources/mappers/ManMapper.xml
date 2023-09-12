@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qianfeng.meet.dao.ManMapper">
+  <resultMap id="BaseResultMap" type="com.qianfeng.meet.pojo.Man">
+    <id column="manId" jdbcType="INTEGER" property="manId" />
+    <result column="manName" jdbcType="VARCHAR" property="manName" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="pwd" jdbcType="VARCHAR" property="pwd" />
+    <result column="mroleId" jdbcType="INTEGER" property="mroleId" />
+    <association property="role" resultMap="com.qianfeng.meet.dao.RoleMapper.BaseResultMap">
+    </association>
+  </resultMap>
+  <sql id="Base_Column_List">
+    manId, manName, phone, pwd, mroleId
+  </sql>
+
+  <select id="selectAllz" resultMap="BaseResultMap">
+    select
+      manId, manName, phone, pwd, tm.mroleId,
+      tr.*
+    from tman tm left join tmrole tr on tm.mroleId=tr.mroleId
+    where tm.mroleId=2
+  </select>
+
+  <select id="login" resultMap="BaseResultMap">
+    select
+      manId, manName, phone, pwd, tm.mroleId,
+      tr.*
+    from tman tm left join tmrole tr on tm.mroleId=tr.mroleId
+    where manId=#{manId} and pwd=#{pwd}
+  </select>
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from tman
+    where manId = #{manId,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectAll" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from tman
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from tman
+    where manId = #{manId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.qianfeng.meet.pojo.Man">
+    insert into tman (manId, manName, phone,
+      pwd, mroleId)
+    values (#{manId,jdbcType=INTEGER}, #{manName,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR},
+      #{pwd,jdbcType=VARCHAR}, #{mroleId,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.qianfeng.meet.pojo.Man">
+    insert into tman
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="manId != null">
+        manId,
+      </if>
+      <if test="manName != null">
+        manName,
+      </if>
+      <if test="phone != null">
+        phone,
+      </if>
+      <if test="pwd != null">
+        pwd,
+      </if>
+      <if test="mroleId != null">
+        mroleId,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="manId != null">
+        #{manId,jdbcType=INTEGER},
+      </if>
+      <if test="manName != null">
+        #{manName,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null">
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="pwd != null">
+        #{pwd,jdbcType=VARCHAR},
+      </if>
+      <if test="mroleId != null">
+        #{mroleId,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.qianfeng.meet.pojo.Man">
+    update tman
+    <set>
+      <if test="manName != null">
+        manName = #{manName,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null">
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="pwd != null">
+        pwd = #{pwd,jdbcType=VARCHAR},
+      </if>
+      <if test="mroleId != null">
+        mroleId = #{mroleId,jdbcType=INTEGER},
+      </if>
+    </set>
+    where manId = #{manId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.qianfeng.meet.pojo.Man">
+    update tman
+    set manName = #{manName,jdbcType=VARCHAR},
+      phone = #{phone,jdbcType=VARCHAR},
+      pwd = #{pwd,jdbcType=VARCHAR},
+      mroleId = #{mroleId,jdbcType=INTEGER}
+    where manId = #{manId,jdbcType=INTEGER}
+  </update>
+</mapper>

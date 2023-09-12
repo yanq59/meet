@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qianfeng.meet.dao.BookMapper">
+  <resultMap id="BaseResultMap" type="com.qianfeng.meet.pojo.Book">
+    <id column="bookId" jdbcType="INTEGER" property="bookId" />
+    <result column="theme" jdbcType="VARCHAR" property="theme" />
+    <result column="appendNum" jdbcType="INTEGER" property="appendNum" />
+    <result column="hostId" jdbcType="INTEGER" property="hostId" />
+    <result column="meetId" jdbcType="INTEGER" property="meetId" />
+    <result column="meetType" jdbcType="VARCHAR" property="meetType" />
+    <result column="meetDate" jdbcType="DATE" property="meetDate" />
+    <result column="BeginTimeId" jdbcType="INTEGER" property="beginTimeId" />
+    <result column="EndTimeId" jdbcType="INTEGER" property="endTimeId" />
+
+    <result column="BeginTime"  property="beginTime" />
+    <result column="EndTime"  property="endTime" />
+
+    <result column="appendMan" jdbcType="VARCHAR" property="appendMan" />
+    <result column="bookMan" jdbcType="VARCHAR" property="bookMan" />
+    <result column="bookTime" jdbcType="TIMESTAMP" property="bookTime" />
+
+    <association property="man" resultMap="com.qianfeng.meet.dao.ManMapper.BaseResultMap"></association>
+    <association property="meetTime" resultMap="com.qianfeng.meet.dao.MeetTimeMapper.BaseResultMap"></association>
+<!--    <association property="meet" resultMap="com.qianfeng.meet.dao.MeetMapper.BaseResultMap"></association>-->
+  </resultMap>
+  <sql id="Base_Column_List">
+    bookId, theme, appendNum, hostId, meetId, meetType, meetDate, BeginTimeId, EndTimeId,
+    appendMan, bookMan, bookTime
+  </sql>
+  <select id="selectLikeName" resultMap="BaseResultMap">
+    select
+    tb.*,
+    mt.meettime as BeginTime,
+    mt2.meettime as EndTime,
+    ma.*,
+    tm.*,
+    ts.*,
+    tr.*
+    from tbook tb INNER JOIN meetTime mt on tb.BeginTimeId=mt.meettimeId
+    inner join meetTime mt2 on tb.EndTimeId=mt2.meettimeId
+    inner join tman ma on tb.hostId=ma.manId
+    inner join tmrole tr on ma.mroleId=tr.mroleId
+    inner join tmeet tm on tb.meetId=tm.meetId
+    inner join tstatus ts on tm.statusId=ts.statusId
+    <where>
+      <if test="meetDate != null and meetDate != ''">
+        tb.meetDate=#{meetDate}
+      </if>
+      <if test="manName != null and manName != ''">
+        and ma.manName like concat('%',#{manName},'%')
+      </if>
+    </where>
+
+  </select>
+  <select id="selectByMeetDate" resultMap="BaseResultMap" parameterType="string">
+    select
+      tb.*,
+      mt.meettime as BeginTime,
+      mt2.meettime as EndTime,
+      man.*,
+      tm.*,
+      ts.*,
+      tr.*
+    from tbook tb INNER JOIN meetTime mt on tb.BeginTimeId=mt.meettimeId
+                  inner join meetTime mt2 on tb.EndTimeId=mt2.meettimeId
+                  inner join tman man on tb.hostId=man.manId
+                  inner join tmrole tr on man.mroleId=tr.mroleId
+                  inner join tmeet tm on tb.meetId=tm.meetId
+                  inner join tstatus ts on tm.statusId=ts.statusId
+    where tb.meetDate=#{meetDate}
+
+  </select>
+
+  <select id="selectAll" resultMap="BaseResultMap">
+    select
+      tb.*,
+      mt.meettime as BeginTime,
+      mt2.meettime as EndTime,
+      man.*,
+      tm.*,
+      ts.*
+    from tbook tb INNER JOIN meetTime mt on tb.BeginTimeId=mt.meettimeId
+                  inner join meetTime mt2 on tb.EndTimeId=mt2.meettimeId
+                  inner join tman man on tb.hostId=man.manId
+                  inner join tmeet tm on tb.meetId=tm.meetId
+                  inner join tstatus ts on tm.statusId=ts.statusId
+
+  </select>
+
+  <select id="selectByCondition" resultType="com.qianfeng.meet.pojo.Book">
+    select
+      tb.*,
+      mt.meettime as BeginTime,
+      mt2.meettime as EndTime,
+      man.*,
+      tm.*,
+      ts.*
+    from tbook tb INNER JOIN meetTime mt on tb.BeginTimeId=mt.meettimeId
+                  inner join meetTime mt2 on tb.EndTimeId=mt2.meettimeId
+                  inner join tman man on tb.hostId=man.manId
+                  inner join tmeet tm on tb.meetId=tm.meetId
+                  inner join tstatus ts on tm.statusId=ts.statusId
+    where tm.meetId=#{meetId} and tb.meetDate=#{meetDate}
+  </select>
+
+
+
+  <select id="selectByMeetId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+      tb.*,
+      mt.meettime as beginTime,
+      mt2.meettime as endTime,
+      man.*,
+      tm.*,
+           ts.*
+    from tbook tb INNER JOIN meetTime mt on tb.BeginTimeId=mt.meettimeId
+                  inner join meetTime mt2 on tb.EndTimeId=mt2.meettimeId
+                  inner join tman man on tb.hostId=man.manId
+                  inner join tmeet tm on tb.meetId=tm.meetId
+                  inner join tstatus ts on tm.statusId=ts.statusId
+    where tb.meetId=#{meetId}
+  </select>
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from tbook
+    where bookId = #{bookId,jdbcType=INTEGER}
+  </select>
+
+
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from tbook
+    where bookId = #{bookId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.qianfeng.meet.pojo.Book">
+    insert into tbook (bookId, theme, appendNum,
+      hostId, meetId, meetType,
+      meetDate, BeginTimeId, EndTimeId,
+      appendMan, bookMan, bookTime
+      )
+    values (#{bookId,jdbcType=INTEGER}, #{theme,jdbcType=VARCHAR}, #{appendNum,jdbcType=INTEGER},
+      #{hostId,jdbcType=INTEGER}, #{meetId,jdbcType=INTEGER}, #{meetType,jdbcType=VARCHAR},
+      #{meetDate,jdbcType=DATE}, #{beginTimeId,jdbcType=INTEGER}, #{endTimeId,jdbcType=INTEGER},
+      #{appendMan,jdbcType=VARCHAR}, #{bookMan,jdbcType=VARCHAR}, #{bookTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.qianfeng.meet.pojo.Book">
+    insert into tbook
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="bookId != null">
+        bookId,
+      </if>
+      <if test="theme != null">
+        theme,
+      </if>
+      <if test="appendNum != null">
+        appendNum,
+      </if>
+      <if test="hostId != null">
+        hostId,
+      </if>
+      <if test="meetId != null">
+        meetId,
+      </if>
+      <if test="meetType != null">
+        meetType,
+      </if>
+      <if test="meetDate != null">
+        meetDate,
+      </if>
+      <if test="beginTimeId != null">
+        BeginTimeId,
+      </if>
+      <if test="endTimeId != null">
+        EndTimeId,
+      </if>
+      <if test="appendMan != null">
+        appendMan,
+      </if>
+      <if test="bookMan != null">
+        bookMan,
+      </if>
+      <if test="bookTime != null">
+        bookTime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="bookId != null">
+        #{bookId,jdbcType=INTEGER},
+      </if>
+      <if test="theme != null">
+        #{theme,jdbcType=VARCHAR},
+      </if>
+      <if test="appendNum != null">
+        #{appendNum,jdbcType=INTEGER},
+      </if>
+      <if test="hostId != null">
+        #{hostId,jdbcType=INTEGER},
+      </if>
+      <if test="meetId != null">
+        #{meetId,jdbcType=INTEGER},
+      </if>
+      <if test="meetType != null">
+        #{meetType,jdbcType=VARCHAR},
+      </if>
+      <if test="meetDate != null">
+        #{meetDate,jdbcType=DATE},
+      </if>
+      <if test="beginTimeId != null">
+        #{beginTimeId,jdbcType=INTEGER},
+      </if>
+      <if test="endTimeId != null">
+        #{endTimeId,jdbcType=INTEGER},
+      </if>
+      <if test="appendMan != null">
+        #{appendMan,jdbcType=VARCHAR},
+      </if>
+      <if test="bookMan != null">
+        #{bookMan,jdbcType=VARCHAR},
+      </if>
+      <if test="bookTime != null">
+        #{bookTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.qianfeng.meet.pojo.Book">
+    update tbook
+    <set>
+      <if test="theme != null">
+        theme = #{theme,jdbcType=VARCHAR},
+      </if>
+      <if test="appendNum != null">
+        appendNum = #{appendNum,jdbcType=INTEGER},
+      </if>
+      <if test="hostId != null">
+        hostId = #{hostId,jdbcType=INTEGER},
+      </if>
+      <if test="meetId != null">
+        meetId = #{meetId,jdbcType=INTEGER},
+      </if>
+      <if test="meetType != null">
+        meetType = #{meetType,jdbcType=VARCHAR},
+      </if>
+      <if test="meetDate != null">
+        meetDate = #{meetDate,jdbcType=DATE},
+      </if>
+      <if test="beginTimeId != null">
+        BeginTimeId = #{beginTimeId,jdbcType=INTEGER},
+      </if>
+      <if test="endTimeId != null">
+        EndTimeId = #{endTimeId,jdbcType=INTEGER},
+      </if>
+      <if test="appendMan != null">
+        appendMan = #{appendMan,jdbcType=VARCHAR},
+      </if>
+      <if test="bookMan != null">
+        bookMan = #{bookMan,jdbcType=VARCHAR},
+      </if>
+      <if test="bookTime != null">
+        bookTime = #{bookTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where bookId = #{bookId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.qianfeng.meet.pojo.Book">
+    update tbook
+    set theme = #{theme,jdbcType=VARCHAR},
+      appendNum = #{appendNum,jdbcType=INTEGER},
+      hostId = #{hostId,jdbcType=INTEGER},
+      meetId = #{meetId,jdbcType=INTEGER},
+      meetType = #{meetType,jdbcType=VARCHAR},
+      meetDate = #{meetDate,jdbcType=DATE},
+      BeginTimeId = #{beginTimeId,jdbcType=INTEGER},
+      EndTimeId = #{endTimeId,jdbcType=INTEGER},
+      appendMan = #{appendMan,jdbcType=VARCHAR},
+      bookMan = #{bookMan,jdbcType=VARCHAR},
+      bookTime = #{bookTime,jdbcType=TIMESTAMP}
+    where bookId = #{bookId,jdbcType=INTEGER}
+  </update>
+</mapper>

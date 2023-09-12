@@ -1,0 +1,26 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: SHIRO2302  # 服务的名字
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://localhost:3306/3end?useUnicode=true&characterEncoding=utf-8
+    username: root
+    password: root
+    driver-class-name: com.mysql.jdbc.Driver
+  mvc:
+    view:
+      prefix: /
+      suffix: .jsp    # springMVC配置视图的位置  和 扩展名
+mybatis:
+  type-aliases-package: com.qianfeng.day0823_springboot_vue.pojo  # 配置实体类的位置
+  mapper-locations: mappers/*.xml   # 配置mapper映射文件的位置
+  configuration:
+    use-generated-keys: true   # mybatis 可以使用自动生成的主键  自增id
+    map-underscore-to-camel-case: true  # 要求mybatis中接口里的方法必须遵从驼峰命名法
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #    控制台输出sql
+logging:
+  level:
+    com.qianfeng: debug
+    org.springframework: info
